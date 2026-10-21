@@ -1,95 +1,379 @@
-# MiniComp — Generador de Código Intermedio
-**Proyecto Integrador — Unidad 2 | Lenguajes y Autómatas II**
+# MiniComp: Generador de Código Intermedio
 
-MiniComp es un prototipo didáctico de compilador que analiza un pseudolenguaje en español y genera representaciones intermedias del código fuente: **Tabla de Símbolos**, conversiones a notación **Infija, Prefija y Postfija**, así como **Cuádruplos** y **Triplos**.
+- **LENGUAJES Y AUTÓMATAS II**
+- **GRUPO:** 6N1
+- **UNIDAD 2:** GENERACIÓN DE CÓDIGO INTERMEDIO
 
----
-
-## 📋 Características Principales
-
-1. **Lectura y Validación Léxica/Sintáctica:**
-   - Análisis léxico con reporte de línea y verificación de balanceo de delimitadores.
-   - Parser descendente recursivo con Árbol de Sintaxis Abstracta (AST).
-   - Detección de errores comunes: asignación sin expresión, identificadores no declarados, redeclaraciones y símbolos no permitidos.
-2. **Tabla de Símbolos:**
-   - Registro de variables con nombre, tipo de dato (`entero`, `decimal`) y valor inicial.
-3. **Conversión de Notaciones:**
-   - Conversión de expresiones binarias a notación **Infija** (paréntesis mínimos), **Prefija** y **Postfija** respetando la precedencia de operadores.
-4. **Código Intermedio:**
-   - **Cuádruplos:** Instrucciones de formato `(operador, arg1, arg2, resultado)` empleando variables temporales (`t1, t2...`).
-   - **Triplos:** Instrucciones de formato `(operador, arg1, arg2)` referenciando resultados previos por número de instrucción `(1), (2)...`.
-   - Soporte para saltos condicionales (`IF_FALSE`, etiquetas `LABEL`) y llamadas a funciones (`PARAM`, `CALL`).
-5. **Interfaz Gráfica (Swing):**
-   - Editor de entrada con atajo `Ctrl+Enter` para procesar.
-   - Pestañas organizadas por resultados.
-   - Selector de pruebas mínimas precargadas y botón para cargar archivos `.txt`.
+# Nombres de Equipo:
+- Estrada Eligio Eric
+- Rojas Hernandez Pamela 
+- Rene Castañeda Blancas David 
+- Morales Guzmán Frida Ivette 
+# Número de Equipo:
+3
 
 ---
 
-## 📐 Gramática Soportada
+# MINICOMP — GENERADOR DE CÓDIGO INTERMEDIO, TABLA DE SÍMBOLOS, NOTACIONES, CUÁDRUPLOS Y TRIPLOS
 
-```ebnf
-programa        -> instruccion* EOF
-instruccion     -> declaracion | asignacion | condicional | llamada
-declaracion     -> ("entero" | "decimal") IDENTIFICADOR ["=" expresion] ";"
-asignacion      -> IDENTIFICADOR "=" expresion ";"
-condicional     -> "si" "(" expresion ")" "{" instruccion* "}"
-llamada         -> IDENTIFICADOR "(" [expresion ("," expresion)*] ")" ";"
+## Descripción
 
-expresion       -> relacional
-relacional      -> aditiva [("<" | ">" | "==" | "!=") aditiva]
-aditiva         -> multiplicativa [("+" | "-") multiplicativa]*
-multiplicativa  -> factor [("*" | "/") factor]*
-factor          -> NUMERO_ENTERO | NUMERO_DECIMAL | IDENTIFICADOR | "(" expresion ")"
+El proyecto consiste en desarrollar una herramienta didáctica denominada **MiniComp**, implementada en Java, capaz de procesar instrucciones escritas en un pseudolenguaje estructurado y generar las distintas representaciones intermedias que utiliza un compilador antes de traducir el código a lenguaje máquina.
+
+El sistema recibe el código fuente (ingresado directamente en un editor o cargado desde un archivo de texto `.txt`) y realiza el proceso completo de análisis y síntesis intermedia:
+1. **Análisis léxico:** Reconoce y clasifica los componentes léxicos (palabras clave, identificadores, constantes numéricas enteras y decimales, operadores y delimitadores), verificando el balanceo de delimitadores y reportando símbolos no válidos.
+2. **Análisis sintáctico:** Emplea un parser descendente recursivo que valida la gramática del programa y construye un Árbol de Sintaxis Abstracta (AST) jerárquico respetando la precedencia de operadores.
+3. **Tabla de símbolos:** Extrae y gestiona el registro de variables declaradas, asociando su tipo de dato (`entero`, `decimal`) y su valor o expresión inicial.
+4. **Conversor de notaciones:** Traduce cada expresión aritmética del programa a sus tres formas canónicas: **Infija** (con la cantidad mínima requerida de paréntesis), **Prefija** (polaca) y **Postfija** (polaca inversa).
+5. **Generador de código intermedio:** Recorre el AST en postorden para producir código de tres direcciones en dos formatos estándar:
+   - **Cuádruplos:** Instrucciones `(operador, argumento 1, argumento 2, resultado)` utilizando temporales explícitos (`t1, t2...`).
+   - **Triplos:** Instrucciones `(operador, argumento 1, argumento 2)` referenciando resultados parciales mediante el índice de instrucción `(1), (2)...`.
+   - Soporte para estructuras de control condicional (`si`) mediante etiquetas y saltos simbólicos (`IF_FALSE`, `LABEL`) y llamadas a funciones (`PARAM`, `CALL`).
+
+Los resultados se visualizan a través de una interfaz gráfica desarrollada en Java Swing organizada por pestañas y tablas interactivas.
+
+---
+
+## Objetivo
+
+Desarrollar en Java un software educativo capaz de analizar programas escritos en un pseudolenguaje definido, construir su tabla de símbolos, traducir expresiones a notaciones infija, prefija y postfija, y generar código intermedio coherente en forma de triplos y cuádruplos, incluyendo condicionales y llamadas a funciones, con un manejo claro de errores de entrada.
+
+## Objetivos específicos
+
+- Implementar un analizador léxico que tokenice el código fuente e identifique errores como caracteres inválidos y paréntesis desbalanceados.
+- Implementar un analizador sintáctico descendente recursivo con comprobación estricta de variables no declaradas o duplicadas.
+- Construir un Árbol de Sintaxis Abstracta (AST) que modele fielmente la precedencia de operadores aritméticos y relacionales.
+- Generar y mantener una tabla de símbolos con identificadores, tipos y valores iniciales.
+- Convertir expresiones aritméticas a notación infija, prefija y postfija sin ambigüedades.
+- Generar código intermedio en formato de **cuádruplos** gestionando variables temporales de forma consistente.
+- Generar código intermedio en formato de **triplos** mediante punteros y referencias relativas de instrucción.
+- Traducir instrucciones de salto condicional (`si`) con etiquetas simbólicas.
+- Representar llamadas a funciones del sistema (`imprimir`) o definidas por el usuario.
+- Proveer una interfaz gráfica intuitiva que permita editar código, abrir archivos `.txt`, ejecutar pruebas precargadas y visualizar resultados sin necesidad de reiniciar la aplicación.
+
+---
+
+## Tecnología Utilizada
+
+- **Lenguaje de Programación:** Java (JDK 11+).
+- **Interfaz Gráfica:** Java Swing y AWT (`JFrame`, `JTextArea`, `JTabbedPane`, `JTable`, `DefaultTableModel`, `JSplitPane`, `JFileChooser`, `JComboBox`).
+- **Arquitectura de Software:** Modular desacoplada dividida en paquetes especializados (`lexer`, `parser`, `symboltable`, `notations`, `ir`).
+
+---
+
+## Funcionamiento del Proyecto
+
+El flujo de procesamiento del programa sigue las fases clásicas del front-end y mid-end de un compilador:
+
+```text
+[ Código Fuente (.txt o Teclado) ]
+                │
+                ▼
+        [ Analizador Léxico ]  ───►  Detecta símbolos ilegales y balanceo de paréntesis
+                │ (Tokens)
+                ▼
+      [ Analizador Sintáctico ]  ───►  Verifica reglas gramaticales y variables no declaradas
+                │
+                ▼
+    [ Árbol Sintáctico (AST) ]
+      ├──► [ Tabla de Símbolos ] (Identificador, tipo y valor inicial)
+      ├──► [ Conversor de Notaciones ] (Infija, Prefija, Postfija)
+      └──► [ Generador de Código Intermedio ]
+                ├──► Cuádruplos (Operador, Arg1, Arg2, Temporal/Destino)
+                └──► Triplos (Operador, Arg1, Arg2 referenciados)
+                │
+                ▼
+[ Visualización en Pestañas GUI ]
 ```
 
-### Limitaciones Actuales
-- No incluye bucles iterativos (`mientras`, `para`).
-- No soporta bloques alternativos `sino` (else).
-- Los tipos soportados se limitan a `entero` y `decimal`.
+---
+
+## Gramática y Reglas del Lenguaje
+
+El pseudolenguaje admitido por MiniComp se define mediante la siguiente gramática libre de contexto en notación EBNF:
+
+```ebnf
+programa        ::= instruccion* EOF
+instruccion     ::= declaracion | asignacion | condicional | llamada
+
+declaracion     ::= ("entero" | "decimal") IDENTIFICADOR [ "=" expresion ] ";"
+asignacion      ::= IDENTIFICADOR "=" expresion ";"
+condicional     ::= "si" "(" expresion ")" "{" instruccion* "}"
+llamada         ::= IDENTIFICADOR "(" [ expresion ( "," expresion )* ] ")" ";"
+
+expresion       ::= relacional
+relacional      ::= aditiva [ ( "<" | ">" | "==" | "!=" ) aditiva ]
+aditiva         ::= multiplicativa [ ( "+" | "-" ) multiplicativa ]*
+multiplicativa  ::= factor [ ( "*" | "/" ) factor ]*
+factor          ::= NUMERO_ENTERO 
+                  | NUMERO_DECIMAL 
+                  | IDENTIFICADOR 
+                  | "(" expresion ")"
+```
+
+### Precedencia y Asociatividad de Operadores
+
+| Nivel | Operadores | Descripción | Asociatividad |
+|:-----:|:----------:|-------------|:-------------:|
+| 1 (Más alto) | `( )` | Paréntesis de agrupación | No aplica |
+| 2 | `*`, `/` | Multiplicación y división | Izquierda a derecha |
+| 3 | `+`, `-` | Suma y resta | Izquierda a derecha |
+| 4 (Más bajo) | `<`, `>`, `==`, `!=` | Comparadores relacionales | Izquierda a derecha |
+
+### Limitaciones del Subconjunto
+- No implementa estructuras de control cíclicas (`mientras`, `para`).
+- No cuenta con bloque alternativo `sino` (else).
+- Los tipos admitidos son exclusivamente escalares: `entero` y `decimal` (no se admiten arreglos ni cadenas de texto).
+- Las funciones son tratadas como instrucciones de efecto colateral o procedimientos (`imprimir(...)`), no como expresiones que devuelvan valores dentro de operaciones compuestas.
 
 ---
 
-## 🚀 Requisitos y Ejecución
+## Tabla de Tokens Reconocidos
 
-### Requisitos
-- **Java Development Kit (JDK) 11 o superior**.
+| Categoría | Tokens / Lexemas | Descripción |
+|-----------|------------------|-------------|
+| **Tipos de dato** | `entero`, `decimal` | Declaración de variables numéricas |
+| **Palabras clave** | `si`, `imprimir` | Sentencia condicional y función de salida |
+| **Identificadores** | `resultado`, `total`, `precio`, `a`, `b`... | Letras o guion bajo seguidos de alfanuméricos |
+| **Constantes enteras** | `8`, `3`, `100`, `0` | Secuencia de dígitos |
+| **Constantes decimales**| `3.14`, `12.5`, `0.5` | Dígitos con punto flotante |
+| **Operadores aritméticos** | `+`, `-`, `*`, `/` | Operaciones básicas |
+| **Operadores relacionales** | `<`, `>`, `==`, `!=` | Comparaciones booleanas |
+| **Asignación** | `=` | Asignación de valor a variable |
+| **Delimitadores** | `(`, `)`, `{`, `}`, `;`, `,` | Control de agrupación, bloques y fin de sentencia |
 
-### Compilación y Ejecución desde Terminal
+---
 
-1. **Compilar el proyecto:**
+## Pruebas Mínimas Obligatorias
+
+El sistema incluye las 6 pruebas fundamentales requeridas por la especificación del proyecto, accesibles directamente desde el menú desplegable de la interfaz:
+
+### 1. Precedencia de Operadores
+* **Código de prueba:**
+  ```text
+  entero x;
+  x = 4 + 3 * 2;
+  ```
+* **Notaciones generadas:**
+  - **Infija:** `4 + 3 * 2`
+  - **Prefija:** `+ 4 * 3 2`
+  - **Postfija:** `4 3 2 * +`
+* **Cuádruplos:**
+  1. `(*, 3, 2, t1)`
+  2. `(+, 4, t1, t2)`
+  3. `(=, t2, -, x)`
+* **Triplos:**
+  1. `(*, 3, 2)`
+  2. `(+, 4, (1))`
+  3. `(=, (2), x)`
+
+---
+
+### 2. Agrupación con Paréntesis
+* **Código de prueba:**
+  ```text
+  entero x;
+  x = (4 + 3) * 2;
+  ```
+* **Notaciones generadas:**
+  - **Infija:** `(4 + 3) * 2`
+  - **Prefija:** `* + 4 3 2`
+  - **Postfija:** `4 3 + 2 *`
+* **Cuádruplos:**
+  1. `(+, 4, 3, t1)`
+  2. `(*, t1, 2, t2)`
+  3. `(=, t2, -, x)`
+* **Triplos:**
+  1. `(+, 4, 3)`
+  2. `(*, (1), 2)`
+  3. `(=, (2), x)`
+
+---
+
+### 3. Asignación con Múltiples Variables
+* **Código de prueba:**
+  ```text
+  entero precio = 20;
+  entero cantidad = 6;
+  entero total;
+  total = precio * cantidad;
+  ```
+* **Tabla de Símbolos:**
+  | Identificador | Tipo | Valor inicial |
+  |---------------|------|:-------------:|
+  | `precio` | `entero` | `20` |
+  | `cantidad` | `entero` | `6` |
+  | `total` | `entero` | `-` |
+* **Cuádruplos:**
+  1. `(=, 20, -, precio)`
+  2. `(=, 6, -, cantidad)`
+  3. `(*, precio, cantidad, t1)`
+  4. `(=, t1, -, total)`
+* **Triplos:**
+  1. `(=, 20, precio)`
+  2. `(=, 6, cantidad)`
+  3. `(*, precio, cantidad)`
+  4. `(=, (3), total)`
+
+---
+
+### 4. Estructura Condicional (`si`)
+* **Código de prueba:**
+  ```text
+  entero total = 120;
+  si (total > 100) {
+      total = total - 10;
+  }
+  ```
+* **Cuádruplos:**
+  1. `(=, 120, -, total)`
+  2. `(>, total, 100, t1)`
+  3. `(IF_FALSE, t1, -, L1)`
+  4. `(-, total, 10, t2)`
+  5. `(=, t2, -, total)`
+  6. `(LABEL, -, -, L1)`
+* **Triplos:**
+  1. `(=, 120, total)`
+  2. `(>, total, 100)`
+  3. `(IF_FALSE, (2), L1)`
+  4. `(-, total, 10)`
+  5. `(=, (4), total)`
+  6. `(LABEL, L1, -)`
+
+---
+
+### 5. Llamada a Funciones (`imprimir`)
+* **Código de prueba:**
+  ```text
+  entero total = 120;
+  imprimir(total);
+  ```
+* **Cuádruplos:**
+  1. `(=, 120, -, total)`
+  2. `(PARAM, total, -, -)`
+  3. `(CALL, imprimir, 1, -)`
+* **Triplos:**
+  1. `(=, 120, total)`
+  2. `(PARAM, total, -)`
+  3. `(CALL, imprimir, 1)`
+
+---
+
+### 6. Pruebas de Detección y Manejo de Errores
+
+El compilador valida sintáctica y semánticamente el código antes de emitir representaciones intermedias, informando la causa del error y la línea correspondiente:
+
+| Tipo de Error | Código de Entrada | Mensaje Reportado |
+|:--------------|:------------------|:------------------|
+| **Asignación sin expresión** | `entero x; x = ;` | `• Línea 2: Asignación sin expresión: falta el valor antes de ';'` |
+| **Paréntesis desbalanceado** | `entero x; x = (4 + 3;` | `• Paréntesis desbalanceados: falta cerrar ')'` |
+| **Variable no declarada** | `resultado = a + 1;` | `• Línea 1: Identificador no declarado: 'resultado'` |
+| **Doble declaración** | `entero a; entero a;` | `• Línea 1: La variable 'a' ya fue declarada` |
+| **Símbolo no admitido** | `entero x = 10 @ 2;` | `• Línea 1: Símbolo no admitido: '@'` |
+| **Entrada vacía** | *(texto en blanco)* | `• La entrada está vacía.` |
+
+---
+
+### 7. Programa Completo Integrador
+
+* **Código de entrada:**
+  ```text
+  entero a = 8;
+  entero b = 3;
+  entero resultado;
+  resultado = a + b * 2;
+  si (resultado > 10) {
+      resultado = resultado - 1;
+  }
+  imprimir(resultado);
+  ```
+
+* **Cuádruplos generados:**
+  | # | Operador | Arg 1 | Arg 2 | Resultado |
+  |:-:|:--------:|:-----:|:-----:|:---------:|
+  | (1) | `=` | `8` | `-` | `a` |
+  | (2) | `=` | `3` | `-` | `b` |
+  | (3) | `*` | `b` | `2` | `t1` |
+  | (4) | `+` | `a` | `t1` | `t2` |
+  | (5) | `=` | `t2` | `-` | `resultado` |
+  | (6) | `>` | `resultado` | `10` | `t3` |
+  | (7) | `IF_FALSE` | `t3` | `-` | `L1` |
+  | (8) | `-` | `resultado` | `1` | `t4` |
+  | (9) | `=` | `t4` | `-` | `resultado` |
+  | (10)| `LABEL` | `-` | `-` | `L1` |
+  | (11)| `PARAM` | `resultado` | `-` | `-` |
+  | (12)| `CALL` | `imprimir` | `1` | `-` |
+
+* **Triplos generados:**
+  | # | Operador | Arg 1 | Arg 2 |
+  |:-:|:--------:|:-----:|:-----:|
+  | (1) | `=` | `8` | `a` |
+  | (2) | `=` | `3` | `b` |
+  | (3) | `*` | `b` | `2` |
+  | (4) | `+` | `a` | `(3)` |
+  | (5) | `=` | `(4)` | `resultado` |
+  | (6) | `>` | `resultado` | `10` |
+  | (7) | `IF_FALSE` | `(6)` | `L1` |
+  | (8) | `-` | `resultado` | `1` |
+  | (9) | `=` | `(8)` | `resultado` |
+  | (10)| `LABEL` | `L1` | `-` |
+  | (11)| `PARAM` | `resultado` | `-` |
+  | (12)| `CALL` | `imprimir` | `1` |
+
+---
+
+## Código Intermedio: Cuádruplos vs. Triplos
+
+| Característica | Cuádruplos | Triplos |
+|:--------------|:-----------|:--------|
+| **Estructura** | 4 campos: `(op, arg1, arg2, resultado)` | 3 campos: `(op, arg1, arg2)` |
+| **Manejo de resultados** | Almacenados en variables temporales explícitas (`t1, t2...`). | Referenciados por la posición o índice de la instrucción previa `(n)`. |
+| **Optimización y reordenamiento** | Muy flexible: mover instrucciones no invalida nombres de variables. | Más complejo: mover o eliminar instrucciones requiere actualizar los índices numéricos de referencia. |
+| **Consumo de memoria** | Ocupa más espacio por el registro explícito del resultado. | Más compacto al prescindir del cuarto campo. |
+
+---
+
+## Preguntas Frecuentes para la Presentación (Sección 11)
+
+1. **¿Por qué la multiplicación se genera antes que la suma en `a + b * 2`?**
+   * *Explicación:* Durante el análisis sintáctico descendente recursivo, la regla de términos (`*`, `/`) tiene mayor precedencia y se ubica en un nivel más profundo del AST respecto a las sumas. Al recorrer el árbol en postorden para generar código intermedio, se procesan primero los subárboles más profundos, emitiendo la multiplicación antes que la suma.
+2. **¿Qué diferencia hay entre la notación postfija y los cuádruplos?**
+   * *Explicación:* La notación postfija es una representación lineal sin asignaciones intermedias diseñada para evaluación basada en pila. Los cuádruplos son instrucciones de tres direcciones con estructura fija `(op, arg1, arg2, res)` que asignan explícitamente cada valor calculado a una variable temporal.
+3. **¿Cómo se representa el resultado de una operación en un triplo?**
+   * *Explicación:* En los triplos no existe un campo de resultado; cualquier instrucción posterior que necesite utilizar dicho valor lo referencia colocando entre paréntesis el número de instrucción donde fue producido (por ejemplo `(1)` o `(2)`).
+4. **¿Qué información guarda la tabla de símbolos?**
+   * *Explicación:* Registra los identificadores del programa, su tipo de dato asociado (`entero` o `decimal`) y el valor o expresión inicial con el que fueron declarados.
+5. **¿Cómo indica el código intermedio que una condición no se cumple?**
+   * *Explicación:* Genera una instrucción de salto condicional `IF_FALSE <condicion> <etiqueta>`, la cual transfiere el flujo de control hacia la etiqueta que marca el final del bloque cuando el resultado de la condición evalúa a falso.
+6. **¿Qué entradas no puede procesar todavía el programa y por qué?**
+   * *Explicación:* No admite ciclos iterativos (`mientras`, `para`), ramas alternativas (`sino`), operadores booleanos compuestos (`&&`, `||`) ni tipos compuestos (cadenas, arreglos), dado que el alcance del proyecto se concentró en el subconjunto representativo exigido por el programa de la materia.
+
+---
+
+## Instrucciones de Compilación y Ejecución
+
+### Requisitos Previos
+- Contar con Java Development Kit (JDK) versión 11 o superior instalado.
+
+### 1. Ejecución desde Terminal (PowerShell / Bash)
+
+1. Abrir la terminal en la raíz del proyecto.
+2. Compilar los archivos fuente:
    ```bash
-   javac -d bin -sourcepath unidad2Automatas2/unidad2Automatas2/src unidad2Automatas2/unidad2Automatas2/src/Main.java
+   javac -encoding UTF-8 -d bin -sourcepath unidad2Automatas2/unidad2Automatas2/src unidad2Automatas2/unidad2Automatas2/src/Main.java
    ```
-
-2. **Ejecutar la aplicación:**
+3. Ejecutar la aplicación:
    ```bash
    java -cp bin Main
    ```
 
-3. **Ejecutar en Eclipse o IDE:**
-   - Abrir Eclipse e importar el proyecto existente seleccionando la carpeta `unidad2Automatas2/unidad2Automatas2`.
-   - Ejecutar la clase `Main.java` como *Java Application*.
+### 2. Ejecución desde Eclipse IDE
+1. Abrir Eclipse y seleccionar **File > Import... > General > Existing Projects into Workspace**.
+2. Elegir la carpeta del proyecto `unidad2Automatas2/unidad2Automatas2`.
+3. Hacer clic derecho sobre `Main.java` y seleccionar **Run As > Java Application**.
 
 ---
 
-## 📂 Estructura del Proyecto
+## Conclusión
 
-```text
-├── .gitignore
-├── README.md
-├── ejemplo.txt
-├── Proyecto_Integrador_Unidad_2_Generacion_Codigo_Intermedio.pdf
-├── Rubrica_Proyecto_Integrador_Unidad_2.pdf
-└── unidad2Automatas2/
-    └── unidad2Automatas2/
-        ├── .classpath
-        ├── .project
-        └── src/
-            ├── Main.java              # Ventana principal e integración
-            ├── ir/                    # Generación de Cuádruplos y Triplos
-            ├── lexer/                 # Tokenizador y analizador léxico
-            ├── notations/             # Conversor Infijo / Prefijo / Postfijo
-            ├── parser/                # Parser descendente recursivo y AST
-            └── symboltable/           # Tabla de símbolos
-```
+El proyecto **MiniComp** integra de forma práctica y visual las fases de análisis y síntesis de un compilador para la Unidad 2 de Lenguajes y Autómatas II. A través de la descomposición modular del código fuente, la construcción del AST y la traducción simultánea a notaciones matemáticas, cuádruplos y triplos, se proporciona una comprensión clara de los mecanismos que permiten transformar código de alto nivel en representaciones estructuradas aptas para la generación de código máquina y su posterior optimización.
