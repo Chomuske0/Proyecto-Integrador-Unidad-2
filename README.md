@@ -41,8 +41,9 @@ Desarrollar en Java un software educativo capaz de analizar programas escritos e
 
 ## Objetivos específicos
 
-- Implementar un analizador léxico que tokenice el código fuente e identifique errores como caracteres inválidos y paréntesis desbalanceados.
-- Implementar un analizador sintáctico descendente recursivo con comprobación estricta de variables no declaradas o duplicadas.
+- Implementar un analizador léxico que tokenice el código fuente e identifique símbolos no admitidos.
+- Implementar un analizador sintáctico descendente recursivo que valide la gramática y delimitadores, construyendo el Árbol de Sintaxis Abstracta (AST).
+- Implementar un analizador semántico que compruebe la declaración previa de variables, evite declaraciones duplicadas y valide la tabla de símbolos.
 - Construir un Árbol de Sintaxis Abstracta (AST) que modele fielmente la precedencia de operadores aritméticos y relacionales.
 - Generar y mantener una tabla de símbolos con identificadores, tipos y valores iniciales.
 - Convertir expresiones aritméticas a notación infija, prefija y postfija sin ambigüedades.
