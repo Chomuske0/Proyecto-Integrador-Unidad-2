@@ -14,7 +14,7 @@
 
 ---
 
-# MINICOMP — GENERADOR DE CÓDIGO INTERMEDIO, TABLA DE SÍMBOLOS, NOTACIONES, CUÁDRUPLOS Y TRIPLOS
+# GENERADOR DE CÓDIGO INTERMEDIO, TABLA DE SÍMBOLOS, NOTACIONES, CUÁDRUPLOS Y TRIPLOS
 
 ## Descripción
 
@@ -333,46 +333,6 @@ El compilador valida sintáctica y semánticamente el código antes de emitir re
 
 ---
 
-## Preguntas Frecuentes para la Presentación (Sección 11)
-
-1. **¿Por qué la multiplicación se genera antes que la suma en `a + b * 2`?**
-   * *Explicación:* Durante el análisis sintáctico descendente recursivo, la regla de términos (`*`, `/`) tiene mayor precedencia y se ubica en un nivel más profundo del AST respecto a las sumas. Al recorrer el árbol en postorden para generar código intermedio, se procesan primero los subárboles más profundos, emitiendo la multiplicación antes que la suma.
-2. **¿Qué diferencia hay entre la notación postfija y los cuádruplos?**
-   * *Explicación:* La notación postfija es una representación lineal sin asignaciones intermedias diseñada para evaluación basada en pila. Los cuádruplos son instrucciones de tres direcciones con estructura fija `(op, arg1, arg2, res)` que asignan explícitamente cada valor calculado a una variable temporal.
-3. **¿Cómo se representa el resultado de una operación en un triplo?**
-   * *Explicación:* En los triplos no existe un campo de resultado; cualquier instrucción posterior que necesite utilizar dicho valor lo referencia colocando entre paréntesis el número de instrucción donde fue producido (por ejemplo `(1)` o `(2)`).
-4. **¿Qué información guarda la tabla de símbolos?**
-   * *Explicación:* Registra los identificadores del programa, su tipo de dato asociado (`entero` o `decimal`) y el valor o expresión inicial con el que fueron declarados.
-5. **¿Cómo indica el código intermedio que una condición no se cumple?**
-   * *Explicación:* Genera una instrucción de salto condicional `IF_FALSE <condicion> <etiqueta>`, la cual transfiere el flujo de control hacia la etiqueta que marca el final del bloque cuando el resultado de la condición evalúa a falso.
-6. **¿Qué entradas no puede procesar todavía el programa y por qué?**
-   * *Explicación:* No admite ciclos iterativos (`mientras`, `para`), ramas alternativas (`sino`), operadores booleanos compuestos (`&&`, `||`) ni tipos compuestos (cadenas, arreglos), dado que el alcance del proyecto se concentró en el subconjunto representativo exigido por el programa de la materia.
-
----
-
-## Instrucciones de Compilación y Ejecución
-
-### Requisitos Previos
-- Contar con Java Development Kit (JDK) versión 11 o superior instalado.
-
-### 1. Ejecución desde Terminal (PowerShell / Bash)
-
-1. Abrir la terminal en la raíz del proyecto.
-2. Compilar los archivos fuente:
-   ```bash
-   javac -encoding UTF-8 -d bin -sourcepath unidad2Automatas2/unidad2Automatas2/src unidad2Automatas2/unidad2Automatas2/src/Main.java
-   ```
-3. Ejecutar la aplicación:
-   ```bash
-   java -cp bin Main
-   ```
-
-### 2. Ejecución desde Eclipse IDE
-1. Abrir Eclipse y seleccionar **File > Import... > General > Existing Projects into Workspace**.
-2. Elegir la carpeta del proyecto `unidad2Automatas2/unidad2Automatas2`.
-3. Hacer clic derecho sobre `Main.java` y seleccionar **Run As > Java Application**.
-
----
 
 ## Conclusión
 
