@@ -336,24 +336,7 @@ El compilador valida sintáctica y semánticamente el código antes de emitir re
 
 ---
 
-## Instrucciones de Compilación y Ejecución
-
-### Requisitos
-- **Java Development Kit (JDK) 11 o superior**.
-
-### 1. Desde Eclipse IDE
-1. Abrir Eclipse y seleccionar **File > Import... > General > Existing Projects into Workspace**.
-2. Seleccionar la carpeta `unidad2Automatas2/unidad2Automatas2`.
-3. Ejecutar la clase `Main.java` como **Java Application**.
-
-### 2. Desde Terminal
-```bash
-javac -encoding UTF-8 -d bin -sourcepath unidad2Automatas2/unidad2Automatas2/src unidad2Automatas2/unidad2Automatas2/src/Main.java
-java -cp bin Main
-```
-
----
 
 ## Conclusión
 
-El proyecto **MiniComp** integra de forma práctica y visual las fases de análisis y síntesis de un compilador para la Unidad 2 de Lenguajes y Autómatas II. A través de la descomposición modular del código fuente, la construcción del AST y la traducción simultánea a notaciones matemáticas, cuádruplos y triplos, se proporciona una comprensión clara de los mecanismos que permiten transformar código de alto nivel en representaciones estructuradas aptas para la generación de código máquina y su posterior optimización.
+El proyecto  integra de forma práctica y visual las fases de análisis y síntesis de un compilador para la Unidad 2 de Lenguajes y Autómatas II. A través de la descomposición modular del código fuente, la construcción del AST y la traducción simultánea a notaciones matemáticas, cuádruplos y triplos, se proporciona una comprensión clara de los mecanismos que permiten transformar código de alto nivel en representaciones estructuradas aptas para la generación de código máquina y su posterior optimización.
