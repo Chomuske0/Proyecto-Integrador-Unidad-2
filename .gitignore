@@ -13,5 +13,6 @@ bin/
 # Archivos temporales y empaquetados
 *.zip
 *.log
+*.pdf
 .DS_Store
 Thumbs.db
