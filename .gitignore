@@ -14,5 +14,6 @@ bin/
 *.zip
 *.log
 *.pdf
+.freebuff/
 .DS_Store
 Thumbs.db

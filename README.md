@@ -58,7 +58,7 @@ Desarrollar en Java un software educativo capaz de analizar programas escritos e
 
 - **Lenguaje de Programación:** Java (JDK 11+).
 - **Interfaz Gráfica:** Java Swing y AWT (`JFrame`, `JTextArea`, `JTabbedPane`, `JTable`, `DefaultTableModel`, `JSplitPane`, `JFileChooser`, `JComboBox`).
-- **Arquitectura de Software:** Modular desacoplada dividida en paquetes especializados (`lexer`, `parser`, `semantic`, `symboltable`, `notations`, `ir`).
+- **Arquitectura de Software:** Modular desacoplada dividida en paquetes especializados (`lexico`, `sintactico`, `semantico`, `tablasimbolos`, `notaciones`, `codigo_intermedio`).
 
 ---
 

@@ -1,16 +1,14 @@
-package lexer;
+package lexico;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Recorre el texto de entrada carácter a carácter y produce una lista de
- * tokens.
- *
- * Detecta errores como: símbolos no admitidos, paréntesis desbalanceados y
- * cadenas vacías.
+ * Analizador Léxico:
+ * Recorre el texto de entrada carácter a carácter y produce una lista de tokens.
+ * Detecta errores léxicos como símbolos no admitidos en el alfabeto del lenguaje.
  */
-public class Lexer {
+public class AnalizadorLexico {
 
 	private final String fuente; // código fuente completo
 	private int posicion; // índice actual
@@ -19,7 +17,7 @@ public class Lexer {
 	private final List<String> errores; // errores encontrados
 
 	// ── Constructor ─────────────────────────────────────────
-	public Lexer(String fuente) {
+	public AnalizadorLexico(String fuente) {
 		this.fuente = fuente;
 		this.posicion = 0;
 		this.linea = 1;
@@ -51,7 +49,7 @@ public class Lexer {
 			}
 		}
 
-		tokens.add(new Token(TokenTipo.EOF, "EOF", linea));
+		tokens.add(new Token(TipoToken.EOF, "EOF", linea));
 		return tokens;
 	}
 
@@ -70,7 +68,7 @@ public class Lexer {
 		}
 
 		String lexema = fuente.substring(inicio, posicion);
-		TokenTipo tipo = palabraClave(lexema);
+		TipoToken tipo = palabraClave(lexema);
 		tokens.add(new Token(tipo, lexema, linea));
 	}
 
@@ -92,7 +90,7 @@ public class Lexer {
 		}
 
 		String lexema = fuente.substring(inicio, posicion);
-		TokenTipo tipo = esDecimal ? TokenTipo.NUMERO_DECIMAL : TokenTipo.NUMERO_ENTERO;
+		TipoToken tipo = esDecimal ? TipoToken.NUMERO_DECIMAL : TipoToken.NUMERO_ENTERO;
 		tokens.add(new Token(tipo, lexema, linea));
 	}
 
@@ -103,40 +101,40 @@ public class Lexer {
 
 		switch (c) {
 		case '+':
-			tokens.add(new Token(TokenTipo.MAS, "+", linea));
+			tokens.add(new Token(TipoToken.MAS, "+", linea));
 			break;
 		case '-':
-			tokens.add(new Token(TokenTipo.MENOS, "-", linea));
+			tokens.add(new Token(TipoToken.MENOS, "-", linea));
 			break;
 		case '*':
-			tokens.add(new Token(TokenTipo.MULTIPLICACION, "*", linea));
+			tokens.add(new Token(TipoToken.MULTIPLICACION, "*", linea));
 			break;
 		case '/':
-			tokens.add(new Token(TokenTipo.DIVISION, "/", linea));
+			tokens.add(new Token(TipoToken.DIVISION, "/", linea));
 			break;
 		case '>':
-			tokens.add(new Token(TokenTipo.MAYOR, ">", linea));
+			tokens.add(new Token(TipoToken.MAYOR, ">", linea));
 			break;
 		case '<':
-			tokens.add(new Token(TokenTipo.MENOR, "<", linea));
+			tokens.add(new Token(TipoToken.MENOR, "<", linea));
 			break;
 		case '(':
-			tokens.add(new Token(TokenTipo.PARENTESIS_ABR, "(", linea));
+			tokens.add(new Token(TipoToken.PARENTESIS_ABR, "(", linea));
 			break;
 		case ')':
-			tokens.add(new Token(TokenTipo.PARENTESIS_CIE, ")", linea));
+			tokens.add(new Token(TipoToken.PARENTESIS_CIE, ")", linea));
 			break;
 		case '{':
-			tokens.add(new Token(TokenTipo.LLAVE_ABR, "{", linea));
+			tokens.add(new Token(TipoToken.LLAVE_ABR, "{", linea));
 			break;
 		case '}':
-			tokens.add(new Token(TokenTipo.LLAVE_CIE, "}", linea));
+			tokens.add(new Token(TipoToken.LLAVE_CIE, "}", linea));
 			break;
 		case ';':
-			tokens.add(new Token(TokenTipo.PUNTO_COMA, ";", linea));
+			tokens.add(new Token(TipoToken.PUNTO_COMA, ";", linea));
 			break;
 		case ',':
-			tokens.add(new Token(TokenTipo.COMA, ",", linea));
+			tokens.add(new Token(TipoToken.COMA, ",", linea));
 			break;
 		case '\n':
 			linea++;
@@ -146,9 +144,9 @@ public class Lexer {
 			// puede ser '=' o '=='
 			if (!esFin() && actual() == '=') {
 				avanzar();
-				tokens.add(new Token(TokenTipo.IGUAL_IGUAL, "==", linea));
+				tokens.add(new Token(TipoToken.IGUAL_IGUAL, "==", linea));
 			} else {
-				tokens.add(new Token(TokenTipo.IGUAL, "=", linea));
+				tokens.add(new Token(TipoToken.IGUAL, "=", linea));
 			}
 			break;
 
@@ -156,17 +154,17 @@ public class Lexer {
 			// debe ser '!='
 			if (!esFin() && actual() == '=') {
 				avanzar();
-				tokens.add(new Token(TokenTipo.DIFERENTE, "!=", linea));
+				tokens.add(new Token(TipoToken.DIFERENTE, "!=", linea));
 			} else {
 				errores.add("Línea " + linea + ": Símbolo no admitido '!' (se esperaba '!=')");
-				tokens.add(new Token(TokenTipo.DESCONOCIDO, "!", linea));
+				tokens.add(new Token(TipoToken.DESCONOCIDO, "!", linea));
 			}
 			break;
 
 		default:
 			// símbolo no reconocido
 			errores.add("Línea " + linea + ": Símbolo no admitido '" + c + "'");
-			tokens.add(new Token(TokenTipo.DESCONOCIDO, String.valueOf(c), linea));
+			tokens.add(new Token(TipoToken.DESCONOCIDO, String.valueOf(c), linea));
 		}
 	}
 
@@ -188,18 +186,18 @@ public class Lexer {
 	}
 
 	/** Determina si una palabra es clave del lenguaje o un identificador. */
-	private TokenTipo palabraClave(String palabra) {
+	private TipoToken palabraClave(String palabra) {
 		switch (palabra) {
 		case "entero":
-			return TokenTipo.ENTERO;
+			return TipoToken.ENTERO;
 		case "decimal":
-			return TokenTipo.DECIMAL;
+			return TipoToken.DECIMAL;
 		case "si":
-			return TokenTipo.SI;
+			return TipoToken.SI;
 		case "imprimir":
-			return TokenTipo.IMPRIMIR;
+			return TipoToken.IMPRIMIR;
 		default:
-			return TokenTipo.IDENTIFICADOR;
+			return TipoToken.IDENTIFICADOR;
 		}
 	}
 

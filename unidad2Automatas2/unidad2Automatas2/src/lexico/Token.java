@@ -1,22 +1,22 @@
-package lexer;
+package lexico;
 
 /**
  * Representa un token individual: tipo, valor léxico y línea donde aparece.
  */
 public class Token {
 
-	private final TokenTipo tipo;
+	private final TipoToken tipo;
 	private final String valor;
 	private final int linea;
 
-	public Token(TokenTipo tipo, String valor, int linea) {
+	public Token(TipoToken tipo, String valor, int linea) {
 		this.tipo = tipo;
 		this.valor = valor;
 		this.linea = linea;
 	}
 
 	// ── Getters ─────────────────────────────────────────────
-	public TokenTipo getTipo() {
+	public TipoToken getTipo() {
 		return tipo;
 	}
 

@@ -1,6 +1,6 @@
-package lexer;
+package lexico;
 
-public enum TokenTipo {
+public enum TipoToken {
 
 	// Tipos de dato
 	ENTERO, // palabra clave "entero"

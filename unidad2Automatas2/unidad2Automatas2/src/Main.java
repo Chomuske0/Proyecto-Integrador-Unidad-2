@@ -1,14 +1,14 @@
-import ir.IRGenerator;
-import ir.Quadruple;
-import ir.Triple;
-import lexer.Lexer;
-import lexer.Token;
-import notations.NotationConverter;
-import parser.ASTNode;
-import parser.CompilerException;
-import parser.Parser;
-import semantic.SemanticAnalyzer;
-import symboltable.SymbolTable;
+import codigo_intermedio.Cuadruplo;
+import codigo_intermedio.GeneradorCodigoIntermedio;
+import codigo_intermedio.Triplo;
+import lexico.AnalizadorLexico;
+import lexico.Token;
+import notaciones.ConversorNotaciones;
+import semantico.AnalizadorSemantico;
+import sintactico.AnalizadorSintactico;
+import sintactico.ExcepcionCompilador;
+import sintactico.NodoAST;
+import tablasimbolos.TablaSimbolos;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -202,41 +202,42 @@ public class Main extends JFrame {
 		}
 
 		// 1. Análisis léxico
-		Lexer lexer = new Lexer(src);
-		List<Token> tokens = lexer.tokenizar();
-		if (!lexer.getErrores().isEmpty()) {
-			showErrors(lexer.getErrores());
+		AnalizadorLexico lexico = new AnalizadorLexico(src);
+		List<Token> tokens = lexico.tokenizar();
+		if (!lexico.getErrores().isEmpty()) {
+			showErrors(lexico.getErrores());
 			return;
 		}
 
 		try {
 			// 2. Análisis sintáctico (construcción del AST y validación de gramática)
-			ASTNode program = new Parser(tokens).parseProgram();
+			AnalizadorSintactico sintactico = new AnalizadorSintactico(tokens);
+			NodoAST programa = sintactico.analizarPrograma();
 
 			// 3. Análisis semántico y Tabla de símbolos
-			SemanticAnalyzer semantic = new SemanticAnalyzer();
-			SymbolTable symbolTable = semantic.analyze(program);
-			for (SymbolTable.Entry e : symbolTable.getEntries()) {
-				symbolsModel.addRow(new Object[] { e.id, e.type, e.initialValue });
+			AnalizadorSemantico semantico = new AnalizadorSemantico();
+			TablaSimbolos tablaSimbolos = semantico.analizar(programa);
+			for (TablaSimbolos.Entrada e : tablaSimbolos.getEntradas()) {
+				symbolsModel.addRow(new Object[] { e.id, e.tipo, e.valorInicial });
 			}
 
 			// 4. Notaciones (solo expresiones con operadores)
-			List<ASTNode> exprs = new ArrayList<>();
-			collectExpressions(program, exprs);
-			for (ASTNode ex : exprs) {
-				notationsModel.addRow(new Object[] { NotationConverter.toInfix(ex), NotationConverter.toInfix(ex),
-						NotationConverter.toPrefix(ex), NotationConverter.toPostfix(ex) });
+			List<NodoAST> exprs = new ArrayList<>();
+			collectExpressions(programa, exprs);
+			for (NodoAST ex : exprs) {
+				notationsModel.addRow(new Object[] { ConversorNotaciones.aInfija(ex), ConversorNotaciones.aInfija(ex),
+						ConversorNotaciones.aPrefija(ex), ConversorNotaciones.aPostfija(ex) });
 			}
 
 			// 5. Código intermedio
-			IRGenerator gen = new IRGenerator();
-			gen.generate(program);
+			GeneradorCodigoIntermedio gen = new GeneradorCodigoIntermedio();
+			gen.generar(programa);
 			int i = 1;
-			for (Quadruple q : gen.getQuadruples()) {
-				quadsModel.addRow(new Object[] { "(" + (i++) + ")", q.op, dash(q.arg1), dash(q.arg2), dash(q.result) });
+			for (Cuadruplo q : gen.getCuadruplos()) {
+				quadsModel.addRow(new Object[] { "(" + (i++) + ")", q.op, dash(q.arg1), dash(q.arg2), dash(q.resultado) });
 			}
 			i = 1;
-			for (Triple t : gen.getTriples()) {
+			for (Triplo t : gen.getTriplos()) {
 				triplesModel.addRow(new Object[] { "(" + (i++) + ")", t.op, dash(t.arg1), dash(t.arg2) });
 			}
 
@@ -245,7 +246,7 @@ public class Main extends JFrame {
 				tabs.setSelectedIndex(0);
 			setStatus(" ✔ Análisis completado sin errores.", new Color(0xDFF3E3));
 
-		} catch (CompilerException ex) {
+		} catch (ExcepcionCompilador ex) {
 			clearOutput();
 			showErrors(Collections.singletonList(ex.getMessage()));
 		} catch (RuntimeException ex) {
@@ -258,20 +259,20 @@ public class Main extends JFrame {
 	 * Reúne las expresiones con operador: lado derecho de asignaciones, condiciones
 	 * y argumentos.
 	 */
-	private void collectExpressions(ASTNode n, List<ASTNode> out) {
-		switch (n.kind) {
-		case BLOCK:
-			for (ASTNode c : n.children)
+	private void collectExpressions(NodoAST n, List<NodoAST> out) {
+		switch (n.tipo) {
+		case BLOQUE:
+			for (NodoAST c : n.hijos)
 				collectExpressions(c, out);
 			break;
-		case IF:
-			addIfOperation(n.children.get(0), out);
-			collectExpressions(n.children.get(1), out);
+		case SI:
+			addIfOperation(n.hijos.get(0), out);
+			collectExpressions(n.hijos.get(1), out);
 			break;
-		case DECL:
-		case ASSIGN:
-		case CALL:
-			for (ASTNode c : n.children)
+		case DECLARACION:
+		case ASIGNACION:
+		case LLAMADA:
+			for (NodoAST c : n.hijos)
 				addIfOperation(c, out);
 			break;
 		default:
@@ -279,8 +280,8 @@ public class Main extends JFrame {
 		}
 	}
 
-	private void addIfOperation(ASTNode expr, List<ASTNode> out) {
-		if (expr.kind == ASTNode.Kind.BINARY)
+	private void addIfOperation(NodoAST expr, List<NodoAST> out) {
+		if (expr.tipo == NodoAST.Tipo.BINARIO)
 			out.add(expr);
 	}
 
