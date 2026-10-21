@@ -22,8 +22,6 @@ public class Parser {
 
 	private final List<Token> tokens;
 	private int pos = 0;
-	// Identificadores declarados (puedes reemplazarlo por tu SymbolTable)
-	private final Set<String> declared = new HashSet<>();
 
 	public Parser(List<Token> tokens) {
 		this.tokens = tokens;
@@ -95,47 +93,43 @@ public class Parser {
 		String type = advance().getValor();
 		Token nameToken = expect(TokenTipo.IDENTIFICADOR, "Se esperaba un nombre de variable");
 		String name = nameToken.getValor();
-		if (declared.contains(name)) {
-			throw new CompilerException("Línea " + nameToken.getLinea() + ": La variable '" + name + "' ya fue declarada");
-		}
-		ASTNode node = new ASTNode(ASTNode.Kind.DECL, name);
+		ASTNode node = new ASTNode(ASTNode.Kind.DECL, name, nameToken.getLinea());
 		node.varType = type;
 		if (match(TokenTipo.IGUAL)) {
 			node.children.add(parseExpression());
 		}
 		expect(TokenTipo.PUNTO_COMA, "Falta ';' al final de la declaración");
-		declared.add(name); // se registra después, para que "entero a = a;" falle
 		return node;
 	}
 
 	private ASTNode parseAssignment() {
 		Token idTok = advance();
 		String name = idTok.getValor();
-		checkDeclared(name, idTok.getLinea());
 		expect(TokenTipo.IGUAL, "Se esperaba '=' después de '" + name + "'");
 		ASTNode expr = parseExpression();
 		expect(TokenTipo.PUNTO_COMA, "Falta ';' al final de la asignación");
-		return new ASTNode(ASTNode.Kind.ASSIGN, name, expr);
+		return new ASTNode(ASTNode.Kind.ASSIGN, name, idTok.getLinea(), expr);
 	}
 
 	private ASTNode parseIf() {
-		advance(); // 'si'
+		Token ifTok = advance(); // 'si'
 		expect(TokenTipo.PARENTESIS_ABR, "Se esperaba '(' después de 'si'");
 		ASTNode cond = parseExpression();
 		expect(TokenTipo.PARENTESIS_CIE, "Paréntesis desbalanceado: falta ')' en la condición");
 		expect(TokenTipo.LLAVE_ABR, "Se esperaba '{' para abrir el bloque del 'si'");
-		ASTNode block = new ASTNode(ASTNode.Kind.BLOCK, null);
+		ASTNode block = new ASTNode(ASTNode.Kind.BLOCK, null, ifTok.getLinea());
 		while (!check(TokenTipo.LLAVE_CIE) && !check(TokenTipo.EOF)) {
 			block.children.add(parseStatement());
 		}
 		expect(TokenTipo.LLAVE_CIE, "Falta '}' para cerrar el bloque del 'si'");
-		return new ASTNode(ASTNode.Kind.IF, null, cond, block);
+		return new ASTNode(ASTNode.Kind.IF, null, ifTok.getLinea(), cond, block);
 	}
 
 	private ASTNode parseCall() {
-		String name = advance().getValor();
+		Token callTok = advance();
+		String name = callTok.getValor();
 		expect(TokenTipo.PARENTESIS_ABR, "Se esperaba '(' después de '" + name + "'");
-		ASTNode call = new ASTNode(ASTNode.Kind.CALL, name);
+		ASTNode call = new ASTNode(ASTNode.Kind.CALL, name, callTok.getLinea());
 		if (!check(TokenTipo.PARENTESIS_CIE)) {
 			do {
 				call.children.add(parseExpression());
@@ -151,9 +145,9 @@ public class Parser {
 		ASTNode left = parseAdditive();
 		if (check(TokenTipo.MENOR) || check(TokenTipo.MAYOR) || check(TokenTipo.IGUAL_IGUAL)
 				|| check(TokenTipo.DIFERENTE)) {
-			String op = advance().getValor();
+			Token opTok = advance();
 			ASTNode right = parseAdditive();
-			return new ASTNode(ASTNode.Kind.BINARY, op, left, right);
+			return new ASTNode(ASTNode.Kind.BINARY, opTok.getValor(), opTok.getLinea(), left, right);
 		}
 		return left;
 	}
@@ -161,8 +155,8 @@ public class Parser {
 	private ASTNode parseAdditive() {
 		ASTNode left = parseTerm();
 		while (check(TokenTipo.MAS) || check(TokenTipo.MENOS)) {
-			String op = advance().getValor();
-			left = new ASTNode(ASTNode.Kind.BINARY, op, left, parseTerm());
+			Token opTok = advance();
+			left = new ASTNode(ASTNode.Kind.BINARY, opTok.getValor(), opTok.getLinea(), left, parseTerm());
 		}
 		return left; // asociativo a la izquierda: a - b - c = (a - b) - c
 	}
@@ -170,8 +164,8 @@ public class Parser {
 	private ASTNode parseTerm() {
 		ASTNode left = parseFactor();
 		while (check(TokenTipo.MULTIPLICACION) || check(TokenTipo.DIVISION)) {
-			String op = advance().getValor();
-			left = new ASTNode(ASTNode.Kind.BINARY, op, left, parseFactor());
+			Token opTok = advance();
+			left = new ASTNode(ASTNode.Kind.BINARY, opTok.getValor(), opTok.getLinea(), left, parseFactor());
 		}
 		return left;
 	}
@@ -182,11 +176,10 @@ public class Parser {
 		case NUMERO_ENTERO:
 		case NUMERO_DECIMAL:
 			advance();
-			return new ASTNode(ASTNode.Kind.NUMBER, t.getValor());
+			return new ASTNode(ASTNode.Kind.NUMBER, t.getValor(), t.getLinea());
 		case IDENTIFICADOR:
 			Token idTok = advance();
-			checkDeclared(idTok.getValor(), idTok.getLinea());
-			return new ASTNode(ASTNode.Kind.VAR, idTok.getValor());
+			return new ASTNode(ASTNode.Kind.VAR, idTok.getValor(), idTok.getLinea());
 		case PARENTESIS_ABR: {
 			advance();
 			ASTNode inner = parseExpression();
@@ -199,12 +192,6 @@ public class Parser {
 			throw new CompilerException("Línea " + t.getLinea() + ": Símbolo no admitido: '" + t.getValor() + "'");
 		default:
 			throw new CompilerException("Línea " + t.getLinea() + ": Expresión inválida cerca de '" + t.getValor() + "'");
-		}
-	}
-
-	private void checkDeclared(String name, int linea) {
-		if (!declared.contains(name)) {
-			throw new CompilerException("Línea " + linea + ": Identificador no declarado: '" + name + "'");
 		}
 	}
 }

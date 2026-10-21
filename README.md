@@ -21,11 +21,12 @@
 El proyecto consiste en desarrollar una herramienta didáctica denominada **MiniComp**, implementada en Java, capaz de procesar instrucciones escritas en un pseudolenguaje estructurado y generar las distintas representaciones intermedias que utiliza un compilador antes de traducir el código a lenguaje máquina.
 
 El sistema recibe el código fuente (ingresado directamente en un editor o cargado desde un archivo de texto `.txt`) y realiza el proceso completo de análisis y síntesis intermedia:
-1. **Análisis léxico:** Reconoce y clasifica los componentes léxicos (palabras clave, identificadores, constantes numéricas enteras y decimales, operadores y delimitadores), verificando el balanceo de delimitadores y reportando símbolos no válidos.
-2. **Análisis sintáctico:** Emplea un parser descendente recursivo que valida la gramática del programa y construye un Árbol de Sintaxis Abstracta (AST) jerárquico respetando la precedencia de operadores.
-3. **Tabla de símbolos:** Extrae y gestiona el registro de variables declaradas, asociando su tipo de dato (`entero`, `decimal`) y su valor o expresión inicial.
-4. **Conversor de notaciones:** Traduce cada expresión aritmética del programa a sus tres formas canónicas: **Infija** (con la cantidad mínima requerida de paréntesis), **Prefija** (polaca) y **Postfija** (polaca inversa).
-5. **Generador de código intermedio:** Recorre el AST en postorden para producir código de tres direcciones en dos formatos estándar:
+1. **Análisis léxico:** Reconoce y clasifica los componentes léxicos (palabras clave, identificadores, constantes numéricas enteras y decimales, operadores y delimitadores), reportando símbolos no válidos.
+2. **Análisis sintáctico:** Emplea un parser descendente recursivo que valida la gramática del programa, delimitadores y estructura de bloques, construyendo un Árbol de Sintaxis Abstracta (AST) jerárquico respetando la precedencia de operadores.
+3. **Análisis semántico:** Recorre el AST para comprobar que los identificadores utilizados hayan sido declarados, detectar variables duplicadas y validar que no haya autorreferencias en la inicialización.
+4. **Tabla de símbolos:** Registra las variables validadas, su tipo de dato (`entero`, `decimal`) y su valor o expresión inicial.
+5. **Conversor de notaciones:** Traduce cada expresión aritmética del programa a sus tres formas canónicas: **Infija** (con la cantidad mínima requerida de paréntesis), **Prefija** (polaca) y **Postfija** (polaca inversa).
+6. **Generador de código intermedio:** Recorre el AST en postorden para producir código de tres direcciones en dos formatos estándar:
    - **Cuádruplos:** Instrucciones `(operador, argumento 1, argumento 2, resultado)` utilizando temporales explícitos (`t1, t2...`).
    - **Triplos:** Instrucciones `(operador, argumento 1, argumento 2)` referenciando resultados parciales mediante el índice de instrucción `(1), (2)...`.
    - Soporte para estructuras de control condicional (`si`) mediante etiquetas y saltos simbólicos (`IF_FALSE`, `LABEL`) y llamadas a funciones (`PARAM`, `CALL`).
@@ -57,7 +58,7 @@ Desarrollar en Java un software educativo capaz de analizar programas escritos e
 
 - **Lenguaje de Programación:** Java (JDK 11+).
 - **Interfaz Gráfica:** Java Swing y AWT (`JFrame`, `JTextArea`, `JTabbedPane`, `JTable`, `DefaultTableModel`, `JSplitPane`, `JFileChooser`, `JComboBox`).
-- **Arquitectura de Software:** Modular desacoplada dividida en paquetes especializados (`lexer`, `parser`, `symboltable`, `notations`, `ir`).
+- **Arquitectura de Software:** Modular desacoplada dividida en paquetes especializados (`lexer`, `parser`, `semantic`, `symboltable`, `notations`, `ir`).
 
 ---
 
@@ -69,21 +70,22 @@ El flujo de procesamiento del programa sigue las fases clásicas del front-end y
 [ Código Fuente (.txt o Teclado) ]
                 │
                 ▼
-        [ Analizador Léxico ]  ───►  Detecta símbolos ilegales y balanceo de paréntesis
+        [ Analizador Léxico ]  ───►  Convierte caracteres en Tokens y detecta símbolos no admitidos
                 │ (Tokens)
                 ▼
-      [ Analizador Sintáctico ]  ───►  Verifica reglas gramaticales y variables no declaradas
-                │
+      [ Analizador Sintáctico ]  ───►  Valida gramática, delimitadores y construye el AST
+                │ (AST)
                 ▼
-    [ Árbol Sintáctico (AST) ]
-      ├──► [ Tabla de Símbolos ] (Identificador, tipo y valor inicial)
-      ├──► [ Conversor de Notaciones ] (Infija, Prefija, Postfija)
-      └──► [ Generador de Código Intermedio ]
-                ├──► Cuádruplos (Operador, Arg1, Arg2, Temporal/Destino)
-                └──► Triplos (Operador, Arg1, Arg2 referenciados)
+      [ Analizador Semántico ]  ───►  Valida variables declaradas/duplicadas y genera la Tabla de Símbolos
                 │
-                ▼
-[ Visualización en Pestañas GUI ]
+                ├──────────────────────┬─────────────────────────┐
+                ▼                      ▼                         ▼
+      [ Tabla de Símbolos ]   [ Notaciones ]         [ Código Intermedio ]
+                               (Infija/Pref/Post)      (Cuádruplos y Triplos)
+                │                      │                         │
+                └──────────────────────┼─────────────────────────┘
+                                       ▼
+                        [ Visualización en Pestañas GUI ]
 ```
 
 ---

@@ -21,12 +21,18 @@ public class ASTNode {
 	public final Kind kind;
 	public final String value;
 	public String varType; // solo para DECL
+	public int line;
 	public final List<ASTNode> children = new ArrayList<>();
 
-	public ASTNode(Kind kind, String value, ASTNode... kids) {
+	public ASTNode(Kind kind, String value, int line, ASTNode... kids) {
 		this.kind = kind;
 		this.value = value;
+		this.line = line;
 		this.children.addAll(Arrays.asList(kids));
+	}
+
+	public ASTNode(Kind kind, String value, ASTNode... kids) {
+		this(kind, value, 0, kids);
 	}
 
 	public ASTNode left() {

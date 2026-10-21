@@ -14,7 +14,7 @@ public class SymbolTable {
 	public static class Entry {
 		public final String id, type, initialValue;
 
-		Entry(String id, String type, String initialValue) {
+		public Entry(String id, String type, String initialValue) {
 			this.id = id;
 			this.type = type;
 			this.initialValue = initialValue;
@@ -22,6 +22,10 @@ public class SymbolTable {
 	}
 
 	private final Map<String, Entry> entries = new LinkedHashMap<>();
+
+	public void add(String id, String type, String initialValue) {
+		entries.put(id, new Entry(id, type, initialValue));
+	}
 
 	public List<Entry> getEntries() {
 		return new ArrayList<>(entries.values());

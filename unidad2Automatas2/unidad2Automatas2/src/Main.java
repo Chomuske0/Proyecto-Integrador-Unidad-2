@@ -7,6 +7,7 @@ import notations.NotationConverter;
 import parser.ASTNode;
 import parser.CompilerException;
 import parser.Parser;
+import semantic.SemanticAnalyzer;
 import symboltable.SymbolTable;
 
 import javax.swing.*;
@@ -209,11 +210,13 @@ public class Main extends JFrame {
 		}
 
 		try {
-			// 2. Análisis sintáctico
+			// 2. Análisis sintáctico (construcción del AST y validación de gramática)
 			ASTNode program = new Parser(tokens).parseProgram();
 
-			// 3. Tabla de símbolos
-			for (SymbolTable.Entry e : SymbolTable.fromAST(program).getEntries()) {
+			// 3. Análisis semántico y Tabla de símbolos
+			SemanticAnalyzer semantic = new SemanticAnalyzer();
+			SymbolTable symbolTable = semantic.analyze(program);
+			for (SymbolTable.Entry e : symbolTable.getEntries()) {
 				symbolsModel.addRow(new Object[] { e.id, e.type, e.initialValue });
 			}
 
