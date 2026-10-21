@@ -81,21 +81,22 @@ public class Parser {
 			return parseCall();
 		case IDENTIFICADOR:
 			// ID ( ... ) es llamada; ID = ... es asignación
-			if (tokens.get(pos + 1).getTipo() == TokenTipo.PARENTESIS_ABR)
+			if (pos + 1 < tokens.size() && tokens.get(pos + 1).getTipo() == TokenTipo.PARENTESIS_ABR)
 				return parseCall();
 			return parseAssignment();
 		case DESCONOCIDO:
-			throw new CompilerException("Símbolo no admitido: '" + peek().getValor() + "'");
+			throw new CompilerException("Línea " + peek().getLinea() + ": Símbolo no admitido: '" + peek().getValor() + "'");
 		default:
-			throw new CompilerException("Instrucción no válida: '" + peek().getValor() + "'");
+			throw new CompilerException("Línea " + peek().getLinea() + ": Instrucción no válida (se encontró '" + peek().getValor() + "')");
 		}
 	}
 
 	private ASTNode parseDeclaration() {
 		String type = advance().getValor();
-		String name = expect(TokenTipo.IDENTIFICADOR, "Se esperaba un nombre de variable").getValor();
+		Token nameToken = expect(TokenTipo.IDENTIFICADOR, "Se esperaba un nombre de variable");
+		String name = nameToken.getValor();
 		if (declared.contains(name)) {
-			throw new CompilerException("La variable '" + name + "' ya fue declarada");
+			throw new CompilerException("Línea " + nameToken.getLinea() + ": La variable '" + name + "' ya fue declarada");
 		}
 		ASTNode node = new ASTNode(ASTNode.Kind.DECL, name);
 		node.varType = type;
@@ -108,8 +109,9 @@ public class Parser {
 	}
 
 	private ASTNode parseAssignment() {
-		String name = advance().getValor();
-		checkDeclared(name);
+		Token idTok = advance();
+		String name = idTok.getValor();
+		checkDeclared(name, idTok.getLinea());
 		expect(TokenTipo.IGUAL, "Se esperaba '=' después de '" + name + "'");
 		ASTNode expr = parseExpression();
 		expect(TokenTipo.PUNTO_COMA, "Falta ';' al final de la asignación");
@@ -182,9 +184,9 @@ public class Parser {
 			advance();
 			return new ASTNode(ASTNode.Kind.NUMBER, t.getValor());
 		case IDENTIFICADOR:
-			advance();
-			checkDeclared(t.getValor());
-			return new ASTNode(ASTNode.Kind.VAR, t.getValor());
+			Token idTok = advance();
+			checkDeclared(idTok.getValor(), idTok.getLinea());
+			return new ASTNode(ASTNode.Kind.VAR, idTok.getValor());
 		case PARENTESIS_ABR: {
 			advance();
 			ASTNode inner = parseExpression();
@@ -192,17 +194,17 @@ public class Parser {
 			return inner;
 		}
 		case PUNTO_COMA:
-			throw new CompilerException("Asignación sin expresión: falta el valor antes de ';'");
+			throw new CompilerException("Línea " + t.getLinea() + ": Asignación sin expresión: falta el valor antes de ';'");
 		case DESCONOCIDO:
-			throw new CompilerException("Símbolo no admitido: '" + t.getValor() + "'");
+			throw new CompilerException("Línea " + t.getLinea() + ": Símbolo no admitido: '" + t.getValor() + "'");
 		default:
-			throw new CompilerException("Expresión inválida cerca de '" + t.getValor() + "'");
+			throw new CompilerException("Línea " + t.getLinea() + ": Expresión inválida cerca de '" + t.getValor() + "'");
 		}
 	}
 
-	private void checkDeclared(String name) {
+	private void checkDeclared(String name, int linea) {
 		if (!declared.contains(name)) {
-			throw new CompilerException("Identificador no declarado: '" + name + "'");
+			throw new CompilerException("Línea " + linea + ": Identificador no declarado: '" + name + "'");
 		}
 	}
 }

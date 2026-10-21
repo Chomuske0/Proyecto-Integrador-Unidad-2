@@ -52,7 +52,6 @@ public class Lexer {
 		}
 
 		tokens.add(new Token(TokenTipo.EOF, "EOF", linea));
-		verificarBalanceoParentesis();
 		return tokens;
 	}
 
@@ -159,14 +158,14 @@ public class Lexer {
 				avanzar();
 				tokens.add(new Token(TokenTipo.DIFERENTE, "!=", linea));
 			} else {
-				errores.add("ERROR léxico en línea " + linea + ": '!' sin '=' — símbolo no admitido.");
+				errores.add("Línea " + linea + ": Símbolo no admitido '!' (se esperaba '!=')");
 				tokens.add(new Token(TokenTipo.DESCONOCIDO, "!", linea));
 			}
 			break;
 
 		default:
 			// símbolo no reconocido
-			errores.add("ERROR léxico en línea " + linea + ": símbolo no admitido '" + c + "'");
+			errores.add("Línea " + linea + ": Símbolo no admitido '" + c + "'");
 			tokens.add(new Token(TokenTipo.DESCONOCIDO, String.valueOf(c), linea));
 		}
 	}
@@ -202,48 +201,6 @@ public class Lexer {
 		default:
 			return TokenTipo.IDENTIFICADOR;
 		}
-	}
-
-	/**
-	 * Verifica que los paréntesis estén balanceados recorriendo los tokens ya
-	 * generados.
-	 */
-	private void verificarBalanceoParentesis() {
-		int contadorPar = 0;
-		int contadorLlave = 0;
-
-		for (Token t : tokens) {
-			switch (t.getTipo()) {
-			case PARENTESIS_ABR:
-				contadorPar++;
-				break;
-			case PARENTESIS_CIE:
-				contadorPar--;
-				break;
-			case LLAVE_ABR:
-				contadorLlave++;
-				break;
-			case LLAVE_CIE:
-				contadorLlave--;
-				break;
-			default:
-				break;
-			}
-
-			if (contadorPar < 0) {
-				errores.add("ERROR léxico en línea " + t.getLinea() + ": ')' sin '(' correspondiente.");
-				contadorPar = 0;
-			}
-			if (contadorLlave < 0) {
-				errores.add("ERROR léxico en línea " + t.getLinea() + ": '}' sin '{' correspondiente.");
-				contadorLlave = 0;
-			}
-		}
-
-		if (contadorPar > 0)
-			errores.add("ERROR léxico: falta(n) " + contadorPar + " paréntesis de cierre ')'.");
-		if (contadorLlave > 0)
-			errores.add("ERROR léxico: falta(n) " + contadorLlave + " llave(s) de cierre '}'.");
 	}
 
 	private char actual() {

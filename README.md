@@ -266,10 +266,10 @@ El compilador valida sintáctica y semánticamente el código antes de emitir re
 | Tipo de Error | Código de Entrada | Mensaje Reportado |
 |:--------------|:------------------|:------------------|
 | **Asignación sin expresión** | `entero x; x = ;` | `• Línea 2: Asignación sin expresión: falta el valor antes de ';'` |
-| **Paréntesis desbalanceado** | `entero x; x = (4 + 3;` | `• Paréntesis desbalanceados: falta cerrar ')'` |
+| **Paréntesis desbalanceado** | `entero x; x = (4 + 3;` | `• Línea 2: Paréntesis desbalanceado: falta ')' (se encontró ';')` |
 | **Variable no declarada** | `resultado = a + 1;` | `• Línea 1: Identificador no declarado: 'resultado'` |
 | **Doble declaración** | `entero a; entero a;` | `• Línea 1: La variable 'a' ya fue declarada` |
-| **Símbolo no admitido** | `entero x = 10 @ 2;` | `• Línea 1: Símbolo no admitido: '@'` |
+| **Símbolo no admitido** | `entero x = 10 @ 2;` | `• Línea 1: Símbolo no admitido '@'` |
 | **Entrada vacía** | *(texto en blanco)* | `• La entrada está vacía.` |
 
 ---
@@ -333,6 +333,23 @@ El compilador valida sintáctica y semánticamente el código antes de emitir re
 
 ---
 
+## Instrucciones de Compilación y Ejecución
+
+### Requisitos
+- **Java Development Kit (JDK) 11 o superior**.
+
+### 1. Desde Eclipse IDE
+1. Abrir Eclipse y seleccionar **File > Import... > General > Existing Projects into Workspace**.
+2. Seleccionar la carpeta `unidad2Automatas2/unidad2Automatas2`.
+3. Ejecutar la clase `Main.java` como **Java Application**.
+
+### 2. Desde Terminal
+```bash
+javac -encoding UTF-8 -d bin -sourcepath unidad2Automatas2/unidad2Automatas2/src unidad2Automatas2/unidad2Automatas2/src/Main.java
+java -cp bin Main
+```
+
+---
 
 ## Conclusión
 
