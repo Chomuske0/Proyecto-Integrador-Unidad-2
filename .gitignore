@@ -1,0 +1,17 @@
+# Archivos compilados de Java
+*.class
+bin/
+**/bin/
+
+# Archivos de entorno y configuración IDE
+.settings/
+**/.settings/
+.vscode/
+.idea/
+*.iml
+
+# Archivos temporales y empaquetados
+*.zip
+*.log
+.DS_Store
+Thumbs.db

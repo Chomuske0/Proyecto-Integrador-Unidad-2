@@ -1,0 +1,8 @@
+entero a = 8;
+entero b = 3;
+entero resultado;
+resultado = a + b * 2;
+si (resultado > 10) {
+    resultado = resultado - 1;
+}
+imprimir(resultado);
