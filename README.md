@@ -1,4 +1,4 @@
-# MiniComp: Generador de Código Intermedio
+# Generador de Código Intermedio
 
 - **LENGUAJES Y AUTÓMATAS II**
 - **GRUPO:** 6N1
